@@ -63,15 +63,18 @@ class _T24WebserviceState extends State<T24Webservice> with TickerProviderStateM
                   )
                 ),
               ),
-              Container(
-                padding: EdgeInsets.only(left: 15),
-                child: Text(
-                  "Webservice API Assignment",
-                  style: TextStyle(
-                    color: Color(0xff121C3E),
-                    fontFamily: "IBM_Plex_Sans",
-                    fontWeight: FontWeight.w600,
-                    fontSize: 30
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.only(left: 15,right: 15),
+                  child: Text(
+                    "Webservice API Assignment",
+                    style: TextStyle(
+                      color: Color(0xff121C3E),
+                      overflow: TextOverflow.ellipsis,
+                      fontFamily: "IBM_Plex_Sans",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 30
+                    ),
                   ),
                 ),
               )
@@ -83,10 +86,11 @@ class _T24WebserviceState extends State<T24Webservice> with TickerProviderStateM
           alignment: Alignment.center,
           child: Text(
             "An implementation of the the STRAJ t24 Webservice API assignment with reference to the previous work submitted",
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontFamily: "IBM_Plex_Mono",
               fontSize: 14,
-              overflow: TextOverflow.ellipsis,
+              // overflow: TextOverflow.ellipsis,
               color: Color(0xff5A5F66),
               fontWeight: FontWeight.w400
             ),

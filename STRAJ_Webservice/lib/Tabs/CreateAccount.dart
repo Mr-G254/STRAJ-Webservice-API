@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:straj_webservice/Components.dart';
 
+import '../Enums/ResponseType.dart';
+import '../Enums/T24Operation.dart';
+
 class CreateAccount extends StatefulWidget{
   const CreateAccount({super.key});
 
@@ -9,6 +12,38 @@ class CreateAccount extends StatefulWidget{
 }
 
 class _CreateAccountState extends State<CreateAccount>{
+  final customer = TextEditingController();
+  final accountTitle = TextEditingController();
+  final currency = TextEditingController();
+  bool isLoading = false;
+
+  final loadingWidget = SizedBox(
+    width: 23,
+    height: 23,
+    // margin: EdgeInsets.all(5),
+    child: Center(
+      child: CircularProgressIndicator(
+        // padding: EdgeInsets.all(5),
+        strokeWidth: 2.5,
+        strokeCap: StrokeCap.round,
+        color: Colors.white,
+      ),
+    ),
+  );
+
+  final textWidget = Container(
+    padding: EdgeInsets.only(),
+    child: Text(
+      "Create",
+      style: TextStyle(
+          fontFamily: "IBM_Plex_Mono",
+          fontSize: 14,
+          color: Colors.white,
+          fontWeight: FontWeight.w400
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context){
     final display = Column(
@@ -23,6 +58,16 @@ class _CreateAccountState extends State<CreateAccount>{
           ),
         ),
         SizedBox(height: 10,),
+        Row(
+          children: [
+            Expanded(child: Input(controller: accountTitle, label: "Account Title")),
+            SizedBox(width: 20,),
+            Expanded(child: Input(controller: customer, label: "Customer ID")),
+            SizedBox(width: 20,),
+            Expanded(child: Input(controller: currency, label: "Currency")),
+          ],
+        ),
+        SizedBox(height: 20,),
         Container(
           padding: EdgeInsets.only(),
           height: 38,
@@ -32,19 +77,10 @@ class _CreateAccountState extends State<CreateAccount>{
               shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(5)),
               elevation: 0
             ),
-            onPressed: (){},
-            child: Container(
-              padding: EdgeInsets.only(),
-              child: Text(
-                "Create",
-                style: TextStyle(
-                  fontFamily: "IBM_Plex_Mono",
-                  fontSize: 14,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w400
-                ),
-              ),
-            )
+            onPressed: (){
+              Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.success, title: "Account has been successfully created", operation: T24Operation.createAccount,)));
+            },
+            child: isLoading? loadingWidget : textWidget,
           ),
         )
       ],

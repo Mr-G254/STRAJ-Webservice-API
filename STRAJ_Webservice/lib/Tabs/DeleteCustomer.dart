@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:straj_webservice/Components.dart';
 
+import '../Enums/ResponseType.dart';
+import '../Enums/T24Operation.dart';
+
 class DeleteCustomer extends StatefulWidget{
   const DeleteCustomer({super.key});
 
@@ -9,6 +12,36 @@ class DeleteCustomer extends StatefulWidget{
 }
 
 class _DeleteCustomerState extends State<DeleteCustomer>{
+  final customer = TextEditingController();
+  bool isLoading = false;
+
+  final loadingWidget = SizedBox(
+    width: 23,
+    height: 23,
+    // margin: EdgeInsets.all(5),
+    child: Center(
+      child: CircularProgressIndicator(
+        // padding: EdgeInsets.all(5),
+        strokeWidth: 2.5,
+        strokeCap: StrokeCap.round,
+        color: Colors.white,
+      ),
+    ),
+  );
+
+  final textWidget = Container(
+    padding: EdgeInsets.only(),
+    child: Text(
+      "Delete",
+      style: TextStyle(
+        fontFamily: "IBM_Plex_Mono",
+        fontSize: 14,
+        color: Colors.white,
+        fontWeight: FontWeight.w400
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context){
     final display = Column(
@@ -24,27 +57,24 @@ class _DeleteCustomerState extends State<DeleteCustomer>{
         ),
         SizedBox(height: 10,),
         Container(
+          width: 500,
+          padding: EdgeInsets.only(),
+          child: Input(controller: customer, label: "Customer ID"),
+        ),
+        SizedBox(height: 20,),
+        Container(
           padding: EdgeInsets.only(),
           height: 38,
           child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xff0B1F5E),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(5)),
-                  elevation: 0
-              ),
-              onPressed: (){},
-              child: Container(
-                padding: EdgeInsets.only(),
-                child: Text(
-                  "Delete",
-                  style: TextStyle(
-                      fontFamily: "IBM_Plex_Mono",
-                      fontSize: 14,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w400
-                  ),
-                ),
-              )
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xffA8281F),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(5)),
+              elevation: 0
+            ),
+            onPressed: () {
+              Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "Delete an Unauthorised customer: 100006", operation: T24Operation.deleteCustomer,)));
+            },
+            child: isLoading? loadingWidget : textWidget,
           ),
         )
       ],
