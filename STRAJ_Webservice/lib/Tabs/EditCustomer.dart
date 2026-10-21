@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:straj_webservice/Components.dart';
 
+import '../Backend/App.dart';
 import '../Enums/ResponseType.dart';
 import '../Enums/T24Operation.dart';
 
@@ -72,8 +73,11 @@ class _EditCustomerState extends State<EditCustomer>{
               elevation: 0
             ),
             onPressed: (){
+              App.showError.value = false;
               if(customer.text.isNotEmpty){
                 Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "Edit customer ${customer.text} data", operation: T24Operation.editCustomerData,)));
+              }else{
+                App.showError.value = true;
               }
             },
             child: isLoading? loadingWidget : textWidget,

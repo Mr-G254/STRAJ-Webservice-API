@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:straj_webservice/Enums/ResponseType.dart';
 import 'package:straj_webservice/Enums/T24Operation.dart';
 
+import 'Backend/App.dart';
+
 class CustomTab extends StatefulWidget{
   final List<String> tabOptions;
   final List<Widget> tabWidgets;
@@ -33,6 +35,7 @@ class _CustomTabState extends State<CustomTab>{
                 width: 250,
                 child: GestureDetector(
                   onTap: (){
+                    App.showError.value = false;
                     setState(() {
                       _selectedIndex = index;
                     });
@@ -70,13 +73,44 @@ class _CustomTabState extends State<CustomTab>{
       children: widget.tabWidgets
     );
 
+    final showErrorWidget = ValueListenableBuilder(
+      valueListenable: App.showError,
+      builder: (context,value,child){
+        return Visibility(
+          visible: value,
+          child: Container(
+            width: double.infinity,
+            height: 50,
+            alignment: Alignment.centerLeft,
+            margin: EdgeInsets.all(5),
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+                color: Color(0xffA8281F).withValues(alpha: 0.3),
+                borderRadius: BorderRadiusGeometry.circular(5)
+            ),
+            child: Text(
+              " Enter the Customer ID to proceed.",
+              style: TextStyle(
+                  fontFamily: "IBM_Plex_Mono",
+                  fontSize: 14,
+                  overflow: TextOverflow.ellipsis,
+                  color: Color(0xffA8281F),
+                  fontWeight: FontWeight.w400
+              ),
+            ),
+          ),
+        );
+      }
+    );
+
     return Container(
       padding: EdgeInsets.all(0),
       child: Column(
         children: [
           tabBar,
           SizedBox(height: 5,),
-          tabView
+          tabView,
+          showErrorWidget
         ],
       ),
     );
@@ -325,13 +359,13 @@ class CustomDialog extends StatelessWidget{
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12)),
       backgroundColor: Colors.white,
       child: Container(
-        width: 600,
+        width: operation == T24Operation.searchAllCustomerAccounts? 700 : 600,
         padding: EdgeInsets.only(),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             titleBar,
-            operation == T24Operation.createAccount? NewAccountDisplay(data:{}) : operation == T24Operation.editCustomerData? EditCustomerDisplay(data: {}) : operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: {}) : SizedBox(height: 20,),
+            operation == T24Operation.searchAllCustomerAccounts? Flexible(child: AllCustomerAccDisplay(data: {})) : operation == T24Operation.createAccount? NewAccountDisplay(data:{}) : operation == T24Operation.editCustomerData? EditCustomerDisplay(data: {}) : operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: {}) : SizedBox(height: 20,),
             bottomBar
           ],
         ),
@@ -525,6 +559,136 @@ class DeleteCustomerDisplay extends StatelessWidget{
 
     return Container(
       padding: EdgeInsets.only(right: 30,left: 30,top: 15,bottom: 30),
+      child: display,
+    );
+  }
+}
+
+class CustomDataTable extends StatelessWidget{
+  final List<String> columns;
+  final List<List<String>> tableData;
+  final Map<int, TableColumnWidth> columnRatio;
+  const CustomDataTable({super.key,required this.columns,required this.tableData, required this.columnRatio,});
+
+  @override
+  Widget build(BuildContext context){
+
+    final data = SingleChildScrollView(
+      child: Table(
+        columnWidths: columnRatio,
+        children: List.generate(tableData.length, (index){
+              return TableRow(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.zero,
+                      color: Colors.white,
+                      border: Border(
+                        top: BorderSide(color: Colors.white,width: 1),
+                        bottom: BorderSide(color: Color(0xffDCE3F7),width: 1),
+                        right: BorderSide(color: Color(0xffDCE3F7),width: 1),
+                        left: BorderSide(color: Color(0xffDCE3F7),width: 1),
+                      )
+                  ),
+                  children: List.generate(columns.length,
+                          (index2){
+                        return Container(
+                          height: 55,
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.only(top: 10,right: 5,left: 30,bottom: 10),
+                          child: Text(
+                            tableData[index][index2],
+                            style: TextStyle(
+                              height: 1.5,
+                              color: index2 == 1? Color(0xff162F66) : Color(0xff606060),
+                              fontWeight: index2 == 1? FontWeight.w600 : FontWeight.w400,
+                              overflow: TextOverflow.ellipsis,
+                              fontFamily: "IBM_Plex_Mono",
+                              fontSize: 14
+                            ),
+                          ),
+                        );
+                      }
+                  )
+              );
+            }),
+      ),
+    );
+
+    final display = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Table(
+          border: TableBorder.all(style: BorderStyle.none),
+          columnWidths: columnRatio,
+          children: [
+            TableRow(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(3),
+                  bottom: Radius.zero
+                ),
+                border: Border.all(color: Color(0xffDCE3F7)),
+                color: Color(0xffE8EEFC),
+              ),
+              children: List.generate(columns.length, (index){
+                  return Container(
+                    width: double.infinity,
+                    height: 45,
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.only(right: 5,left: 30),
+                    child: Text(
+                      columns[index],
+                      style: TextStyle(
+                        color: Color(0xff606060),
+                        fontFamily: "IBM_Plex_Sans",
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14
+                      ),
+                    ),
+                  );
+                }
+              )
+            )
+          ],
+        ),
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(child: data),
+            ],
+          )
+        )
+      ],
+    );
+
+    return Container(
+      padding: EdgeInsets.only(),
+      child: display,
+    );
+  }
+}
+
+class AllCustomerAccDisplay extends StatelessWidget{
+  const AllCustomerAccDisplay({super.key, required this.data});
+  final Map<String,String> data;
+
+  @override
+  Widget build(BuildContext context) {
+    final display = CustomDataTable(
+      columns: ["Account ID","Type","Currency","Working Balance"],
+      tableData: List.generate(5, (index){
+        return ["100004675","Current Account","USD","10,0036.00"];
+      }),
+      columnRatio: <int, TableColumnWidth>{
+        0 : FlexColumnWidth(2),
+        1 : FlexColumnWidth(3),
+        2 : FlexColumnWidth(1.5),
+        3 : FlexColumnWidth(3),
+      },
+    );
+
+    return Container(
+      padding: EdgeInsets.only(top: 25,right: 30,left: 30),
       child: display,
     );
   }

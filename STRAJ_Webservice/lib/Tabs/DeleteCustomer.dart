@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:straj_webservice/Components.dart';
 
+import '../Backend/App.dart';
 import '../Enums/ResponseType.dart';
 import '../Enums/T24Operation.dart';
 
@@ -72,7 +73,12 @@ class _DeleteCustomerState extends State<DeleteCustomer>{
               elevation: 0
             ),
             onPressed: () {
-              Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "Delete an Unauthorised customer: 100006", operation: T24Operation.deleteCustomer,)));
+              App.showError.value = false;
+              if(customer.text.isNotEmpty) {
+                Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "Delete an Unauthorised customer: ${customer.text}", operation: T24Operation.deleteCustomer,)));
+              }else{
+                App.showError.value = true;
+              }
             },
             child: isLoading? loadingWidget : textWidget,
           ),

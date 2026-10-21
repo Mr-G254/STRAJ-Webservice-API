@@ -3,6 +3,8 @@ import 'package:straj_webservice/Components.dart';
 import 'package:straj_webservice/Enums/ResponseType.dart';
 import 'package:straj_webservice/Enums/T24Operation.dart';
 
+import '../Backend/App.dart';
+
 class SearchAccounts extends StatefulWidget{
   const SearchAccounts({super.key});
 
@@ -71,9 +73,11 @@ class _SearchAccountState extends State<SearchAccounts>{
               elevation: 0
             ),
             onPressed: (){
-
+              App.showError.value = false;
               if(customer.text.isNotEmpty){
                 Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "All accounts for customer ${customer.text}", operation: T24Operation.searchAllCustomerAccounts,)));
+              }else{
+                App.showError.value = true;
               }
             },
             child: isLoading? loadingWidget : textWidget,
