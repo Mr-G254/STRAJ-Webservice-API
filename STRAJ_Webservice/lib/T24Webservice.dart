@@ -15,12 +15,22 @@ class T24Webservice extends StatefulWidget{
 
 class _T24WebserviceState extends State<T24Webservice> with TickerProviderStateMixin{
   late TabController _controller;
+  late TextEditingController _url;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _controller = TabController(length: 4, vsync: this);
+    _url = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller.dispose();
+    _url.dispose();
   }
 
   @override
@@ -81,18 +91,36 @@ class _T24WebserviceState extends State<T24Webservice> with TickerProviderStateM
             ],
           ),
         ),
+        // Container(
+        //   padding: EdgeInsets.all(13),
+        //   alignment: Alignment.center,
+        //   child: Text(
+        //     "An implementation of the the STRAJ t24 Webservice API assignment with reference to the previous work submitted",
+        //     textAlign: TextAlign.center,
+        //     style: TextStyle(
+        //       fontFamily: "IBM_Plex_Mono",
+        //       fontSize: 14,
+        //       // overflow: TextOverflow.ellipsis,
+        //       color: Color(0xff5A5F66),
+        //       fontWeight: FontWeight.w400
+        //     ),
+        //   ),
+        // ),
         Container(
-          padding: EdgeInsets.all(13),
-          alignment: Alignment.center,
-          child: Text(
-            "An implementation of the the STRAJ t24 Webservice API assignment with reference to the previous work submitted",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: "IBM_Plex_Mono",
-              fontSize: 14,
-              // overflow: TextOverflow.ellipsis,
-              color: Color(0xff5A5F66),
-              fontWeight: FontWeight.w400
+          padding: EdgeInsets.only(),
+          child: Card(
+            color: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.circular(8),
+                side: BorderSide(
+                    color: Color(0xffD6DAE0)
+                )
+            ),
+            child: Container(
+              width: 1000,
+              padding: EdgeInsets.only(right: 15,left: 15,bottom: 20,top: 5),
+              child: Input(controller: _url, label: "Web service URL"),
             ),
           ),
         ),
@@ -108,7 +136,7 @@ class _T24WebserviceState extends State<T24Webservice> with TickerProviderStateM
 
     return Container(
       color: Color(0xffF4F5F7),
-      padding: EdgeInsets.only(right: 20,left: 20,top: 20),
+      padding: EdgeInsets.only(right: 20,left: 20,top: 10),
       child: window,
     );
   }

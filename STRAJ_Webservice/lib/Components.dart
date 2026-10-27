@@ -577,39 +577,39 @@ class CustomDataTable extends StatelessWidget{
       child: Table(
         columnWidths: columnRatio,
         children: List.generate(tableData.length, (index){
-              return TableRow(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.zero,
-                      color: Colors.white,
-                      border: Border(
-                        top: BorderSide(color: Colors.white,width: 1),
-                        bottom: BorderSide(color: Color(0xffDCE3F7),width: 1),
-                        right: BorderSide(color: Color(0xffDCE3F7),width: 1),
-                        left: BorderSide(color: Color(0xffDCE3F7),width: 1),
-                      )
-                  ),
-                  children: List.generate(columns.length,
-                          (index2){
-                        return Container(
-                          height: 55,
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(top: 10,right: 5,left: 30,bottom: 10),
-                          child: Text(
-                            tableData[index][index2],
-                            style: TextStyle(
-                              height: 1.5,
-                              color: index2 == 1? Color(0xff162F66) : Color(0xff606060),
-                              fontWeight: index2 == 1? FontWeight.w600 : FontWeight.w400,
-                              overflow: TextOverflow.ellipsis,
-                              fontFamily: "IBM_Plex_Mono",
-                              fontSize: 14
-                            ),
-                          ),
-                        );
-                      }
+            return TableRow(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.zero,
+                  color: Colors.white,
+                  border: Border(
+                    top: BorderSide(color: Colors.white,width: 1),
+                    bottom: BorderSide(color: Color(0xffDCE3F7),width: 1),
+                    right: BorderSide(color: Color(0xffDCE3F7),width: 1),
+                    left: BorderSide(color: Color(0xffDCE3F7),width: 1),
                   )
-              );
-            }),
+                ),
+                children: List.generate(columns.length,
+                      (index2){
+                    return Container(
+                      height: 55,
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.only(top: 10,right: 5,left: 30,bottom: 10),
+                      child: Text(
+                        tableData[index][index2],
+                        style: TextStyle(
+                          height: 1.5,
+                          color: index2 == 1? Color(0xff162F66) : Color(0xff606060),
+                          fontWeight: index2 == 1? FontWeight.w600 : FontWeight.w400,
+                          overflow: TextOverflow.ellipsis,
+                          fontFamily: "IBM_Plex_Mono",
+                          fontSize: 14
+                        ),
+                      ),
+                    );
+                  }
+                )
+            );
+          }),
       ),
     );
 
