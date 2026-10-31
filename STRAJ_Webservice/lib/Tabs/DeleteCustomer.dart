@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:straj_webservice/Components.dart';
 
 import '../Backend/App.dart';
+import '../Backend/SuccessOrFail.dart';
+import '../Enums/OperationStatus.dart';
 import '../Enums/ResponseType.dart';
 import '../Enums/T24Operation.dart';
 
@@ -73,11 +75,11 @@ class _DeleteCustomerState extends State<DeleteCustomer>{
               elevation: 0
             ),
             onPressed: () {
-              App.showError.value = false;
+              App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.clear);
               if(customer.text.isNotEmpty) {
-                Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "Delete an Unauthorised customer: ${customer.text}", operation: T24Operation.deleteCustomer,)));
+                Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "Delete an Unauthorised customer: ${customer.text}", operation: T24Operation.deleteCustomer, data: {'customer' : customer.text},)));
               }else{
-                App.showError.value = true;
+                App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.fail,successOrErrorText: "Enter the Customer ID to proceed");
               }
             },
             child: isLoading? loadingWidget : textWidget,

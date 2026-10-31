@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:straj_webservice/Backend/SuccessOrFail.dart';
 import 'package:straj_webservice/Components.dart';
+import 'package:straj_webservice/Enums/OperationStatus.dart';
 
+import '../Backend/App.dart';
 import '../Enums/ResponseType.dart';
 import '../Enums/T24Operation.dart';
 
@@ -77,8 +80,29 @@ class _CreateAccountState extends State<CreateAccount>{
               shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(5)),
               elevation: 0
             ),
-            onPressed: (){
-              Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.success, title: "Account has been successfully created", operation: T24Operation.createAccount,)));
+            onPressed: ()async{
+              setState(() {
+                isLoading = true;
+              });
+
+              App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.clear);
+              if(customer.text.isEmpty || currency.text.isEmpty || accountTitle.text.isEmpty){
+                App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.fail,successOrErrorText: "Fill all the fields with necessary data to proceed.");
+              }else{
+                try{
+                  final data  = await App.createCurrentAccount(<String,String>{"currency" : currency.text.trim(),"customer" : customer.text.trim(),"accountTitle" : accountTitle.text.trim()});
+
+                  if(context.mounted){
+                    Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.success, title: "Account has been successfully created", operation: T24Operation.createAccount, data: <String,dynamic>{"data" : data},)));
+                  }
+                }catch(e){
+                  App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.fail,successOrErrorText: e.toString());
+                }
+              }
+
+              setState(() {
+                isLoading = false;
+              });
             },
             child: isLoading? loadingWidget : textWidget,
           ),

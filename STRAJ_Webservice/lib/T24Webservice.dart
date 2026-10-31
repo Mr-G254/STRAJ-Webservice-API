@@ -4,6 +4,7 @@ import 'package:straj_webservice/Tabs/DeleteCustomer.dart';
 import 'package:straj_webservice/Tabs/EditCustomer.dart';
 import 'package:straj_webservice/Tabs/SearchAccounts.dart';
 
+import 'Backend/App.dart';
 import 'Components.dart';
 
 class T24Webservice extends StatefulWidget{
@@ -120,7 +121,7 @@ class _T24WebserviceState extends State<T24Webservice> with TickerProviderStateM
             child: Container(
               width: 1000,
               padding: EdgeInsets.only(right: 15,left: 15,bottom: 20,top: 5),
-              child: Input(controller: _url, label: "Web service URL"),
+              child: Input(controller: App.baseURL, label: "Web service URL"),
             ),
           ),
         ),

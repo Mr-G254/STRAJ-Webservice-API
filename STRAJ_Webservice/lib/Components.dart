@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:straj_webservice/Backend/Account.dart';
+import 'package:straj_webservice/Backend/SuccessOrFail.dart';
+import 'package:straj_webservice/Enums/OperationStatus.dart';
 import 'package:straj_webservice/Enums/ResponseType.dart';
 import 'package:straj_webservice/Enums/T24Operation.dart';
 
@@ -35,7 +38,7 @@ class _CustomTabState extends State<CustomTab>{
                 width: 250,
                 child: GestureDetector(
                   onTap: (){
-                    App.showError.value = false;
+                    App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.clear);
                     setState(() {
                       _selectedIndex = index;
                     });
@@ -74,10 +77,10 @@ class _CustomTabState extends State<CustomTab>{
     );
 
     final showErrorWidget = ValueListenableBuilder(
-      valueListenable: App.showError,
+      valueListenable: App.showSuccessOrFail,
       builder: (context,value,child){
         return Visibility(
-          visible: value,
+          visible: value.status == OperationStatus.success || value.status == OperationStatus.fail,
           child: Container(
             width: double.infinity,
             height: 50,
@@ -85,17 +88,17 @@ class _CustomTabState extends State<CustomTab>{
             margin: EdgeInsets.all(5),
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-                color: Color(0xffA8281F).withValues(alpha: 0.3),
-                borderRadius: BorderRadiusGeometry.circular(5)
+              color: value.status == OperationStatus.success? Color(0xff137333).withValues(alpha: 0.3) : Color(0xffA8281F).withValues(alpha: 0.3),
+              borderRadius: BorderRadiusGeometry.circular(5)
             ),
             child: Text(
-              " Enter the Customer ID to proceed.",
+              value.successOrErrorText ?? '',
               style: TextStyle(
-                  fontFamily: "IBM_Plex_Mono",
-                  fontSize: 14,
-                  overflow: TextOverflow.ellipsis,
-                  color: Color(0xffA8281F),
-                  fontWeight: FontWeight.w400
+                fontFamily: "IBM_Plex_Mono",
+                fontSize: 14,
+                overflow: TextOverflow.ellipsis,
+                color: value.status == OperationStatus.success? Color(0xff137333) : Color(0xffA8281F),
+                fontWeight: FontWeight.w400
               ),
             ),
           ),
@@ -230,7 +233,8 @@ class CustomDialog extends StatelessWidget{
   final ResponseType type;
   final String title;
   final T24Operation operation;
-  const CustomDialog({super.key, required this.type, required this.title, required this.operation});
+  final Map<String,dynamic> data;
+  const CustomDialog({super.key, required this.type, required this.title, required this.operation, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -365,7 +369,7 @@ class CustomDialog extends StatelessWidget{
           mainAxisSize: MainAxisSize.min,
           children: [
             titleBar,
-            operation == T24Operation.searchAllCustomerAccounts? Flexible(child: AllCustomerAccDisplay(data: {})) : operation == T24Operation.createAccount? NewAccountDisplay(data:{}) : operation == T24Operation.editCustomerData? EditCustomerDisplay(data: {}) : operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: {}) : SizedBox(height: 20,),
+            operation == T24Operation.searchAllCustomerAccounts? Flexible(child: AllCustomerAccDisplay(data: data)) : operation == T24Operation.createAccount? NewAccountDisplay(data: data) : operation == T24Operation.editCustomerData? EditCustomerDisplay(data: data) : operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: data) : SizedBox(height: 20,),
             bottomBar
           ],
         ),
@@ -380,17 +384,17 @@ class CustomDialog extends StatelessWidget{
 }
 
 class NewAccountDisplay extends StatelessWidget{
-  final Map<String,String> data;
-  NewAccountDisplay({super.key, required this.data,});
-
-  String customer = "100006";
-  String category = '1001';
-  String account = '1000000000046657';
-  String title = 'STRAJ Test Account';
-  String currency = 'USD';
+  final Map<String,dynamic> data;
+  const NewAccountDisplay({super.key, required this.data,});
 
   @override
   Widget build(BuildContext context){
+    final newAcc = data["data"] as Account;
+    String customer = newAcc.customer.toString();
+    String category = newAcc.category ?? '';
+    String account = newAcc.id;
+    String title = newAcc.accountTitle;
+    String currency = newAcc.currency ?? '';
 
     final display = Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(6)),
@@ -482,7 +486,7 @@ class NewAccountLabel extends StatelessWidget{
 }
 
 class EditCustomerDisplay extends StatelessWidget{
-  final Map<String,String> data;
+  final Map<String,dynamic> data;
   EditCustomerDisplay({super.key, required this.data,});
 
   final mnemonic = TextEditingController();
@@ -538,7 +542,7 @@ class EditCustomerDisplay extends StatelessWidget{
 }
 
 class DeleteCustomerDisplay extends StatelessWidget{
-  final Map<String,String> data;
+  final Map<String,dynamic> data;
   const DeleteCustomerDisplay({super.key, required this.data,});
 
   @override
@@ -670,14 +674,17 @@ class CustomDataTable extends StatelessWidget{
 
 class AllCustomerAccDisplay extends StatelessWidget{
   const AllCustomerAccDisplay({super.key, required this.data});
-  final Map<String,String> data;
+  final Map<String,dynamic> data;
 
   @override
   Widget build(BuildContext context) {
+
+    final accounts = data['data'] as List<Account>;
+
     final display = CustomDataTable(
       columns: ["Account ID","Type","Currency","Working Balance"],
-      tableData: List.generate(5, (index){
-        return ["100004675","Current Account","USD","10,0036.00"];
+      tableData: List.generate(accounts.length, (index){
+        return [accounts[index].id,accounts[index].accountType ?? '',accounts[index].currency ?? '',accounts[index].workBalance.toString()];
       }),
       columnRatio: <int, TableColumnWidth>{
         0 : FlexColumnWidth(2),
