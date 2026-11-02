@@ -93,9 +93,10 @@ class _CreateAccountState extends State<CreateAccount>{
                   final data  = await App.createCurrentAccount(<String,String>{"currency" : currency.text.trim(),"customer" : customer.text.trim(),"accountTitle" : accountTitle.text.trim()});
 
                   if(context.mounted){
-                    Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.success, title: "Account has been successfully created", operation: T24Operation.createAccount, data: <String,dynamic>{"data" : data},)));
+                    Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.success, title: "Account has been successfully created", operation: T24Operation.createAccount, data: {"data":data,})));
                   }
                 }catch(e){
+
                   App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.fail,successOrErrorText: e.toString());
                 }
               }

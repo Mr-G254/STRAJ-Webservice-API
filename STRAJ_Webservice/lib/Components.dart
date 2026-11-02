@@ -369,7 +369,7 @@ class CustomDialog extends StatelessWidget{
           mainAxisSize: MainAxisSize.min,
           children: [
             titleBar,
-            operation == T24Operation.searchAllCustomerAccounts? Flexible(child: AllCustomerAccDisplay(data: data)) : operation == T24Operation.createAccount? NewAccountDisplay(data: data) : operation == T24Operation.editCustomerData? EditCustomerDisplay(data: data) : operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: data) : SizedBox(height: 20,),
+            operation == T24Operation.searchAllCustomerAccounts? Flexible(child: AllCustomerAccDisplay(data: data)) : operation == T24Operation.createAccount? NewAccountDisplay(data: data["data"] as Account) : operation == T24Operation.editCustomerData? EditCustomerDisplay(data: data) : operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: data) : SizedBox(height: 20,),
             bottomBar
           ],
         ),
@@ -384,17 +384,16 @@ class CustomDialog extends StatelessWidget{
 }
 
 class NewAccountDisplay extends StatelessWidget{
-  final Map<String,dynamic> data;
+  final Account data;
   const NewAccountDisplay({super.key, required this.data,});
 
   @override
   Widget build(BuildContext context){
-    final newAcc = data["data"] as Account;
-    String customer = newAcc.customer.toString();
-    String category = newAcc.category ?? '';
-    String account = newAcc.id;
-    String title = newAcc.accountTitle;
-    String currency = newAcc.currency ?? '';
+    String customer = data.customer.toString();
+    String category = data.category ?? '';
+    String account = data.id;
+    String title = data.accountTitle;
+    String currency = data.currency ?? '';
 
     final display = Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(6)),

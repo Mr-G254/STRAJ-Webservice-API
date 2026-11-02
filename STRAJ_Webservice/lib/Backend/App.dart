@@ -36,20 +36,21 @@ abstract class App{
     }
   }
 
-  static Future<Map<String,dynamic>> createCurrentAccount(Map<String,String> accData)async{
+  static Future<Account> createCurrentAccount(Map<String,String> accData)async{
     checkForBaseURL();
 
     final request = await http.post(
-      Uri.parse("${baseURL.text.trim()}/party/account/create/curr/account?validate_only=true"),
+      Uri.parse("${baseURL.text.trim()}/party/account/create/curr/account"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"body" : accData})
     );
-    
-    if(request.statusCode == 201){
-      var data = jsonDecode(request.body) as Map<String,dynamic>;
-      data['id'] =  request.headers['id'];
-      print(data);
-      return data;
+
+    if(request.statusCode == 200){
+      var response = jsonDecode(request.body);
+      var data = response['body'];
+      data['id'] = response['header']['id'];
+
+      return Account.fromJson(data);
     }else{
       throw Exception(jsonDecode(request.body)['error']['errorDetails']);
     }

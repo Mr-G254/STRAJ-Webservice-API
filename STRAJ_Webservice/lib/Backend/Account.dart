@@ -2,7 +2,7 @@ class Account {
   final String id;
   final String accountTitle;
   final String? category;
-  final int? customer;
+  final String? customer;
   final String? accountType;
   final String? currency;
   final double? workBalance;
@@ -15,7 +15,7 @@ class Account {
     workBalance: data['workBalance'] as double? ?? 0.00,
     accountTitle: data['accountTitle'] as String? ?? '',
     category: data['category'] as String? ?? '',
-    customer: data['customer'] as int? ?? 0,
+    customer: data['customer'] as String? ?? "",
   );
 }
 
