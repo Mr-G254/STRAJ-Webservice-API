@@ -74,13 +74,32 @@ class _EditCustomerState extends State<EditCustomer>{
               shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(5)),
               elevation: 0
             ),
-            onPressed: (){
+            onPressed: ()async{
               App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.clear);
+
+              setState(() {
+                isLoading = true;
+              });
+
               if(customer.text.isNotEmpty){
-                Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "Edit customer ${customer.text} data", operation: T24Operation.editCustomerData, data: {},)));
+                try{
+                  final data = await App.getCustomerRecord(customer.text.trim());
+
+                  if(context.mounted){
+                    Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "Edit customer ${customer.text} data", operation: T24Operation.editCustomerData, data: {'data' : data},)));
+                  }
+                }catch(e){
+
+                  App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.fail,successOrErrorText: e.toString());
+                }
+
               }else{
                 App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.fail,successOrErrorText: "Enter the Customer ID to proceed");
               }
+
+              setState(() {
+                isLoading = false;
+              });
             },
             child: isLoading? loadingWidget : textWidget,
           ),

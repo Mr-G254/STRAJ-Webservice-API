@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:straj_webservice/Backend/Account.dart';
 import 'package:http/http.dart' as http;
+import 'package:straj_webservice/Backend/Customer.dart';
 import 'package:straj_webservice/Backend/SuccessOrFail.dart';
 import 'package:straj_webservice/Enums/OperationStatus.dart';
 
@@ -56,17 +57,28 @@ abstract class App{
     }
   }
 
-  static Future<Map<String,dynamic>> getCustomerRecord(String customerID)async{
+  static Future<Customer> getCustomerRecord(String customerID)async{
+    final request = await http.get(Uri.parse("${baseURL.text}/party/get/customer/record?customer=$customerID"));
+    if(request.statusCode == 200){
+      final data = jsonDecode(request.body)['body'] as List<dynamic>;
 
-    return <String,dynamic>{};
+      if(data.isEmpty){
+        throw Exception("No data available");
+      }
+
+      return Customer.fromJson(data[0]);
+    }else{
+      throw Exception(jsonDecode(request.body)['message']);
+    }
+
   }
 
-  static Future<void> editCustomerRecord(String customerID, Map<String,dynamic> customerData)async{
+  static Future<void> editCustomerRecord(String customerID, Customer customerData)async{
     checkForBaseURL();
 
     final request = await http.put(
       Uri.parse("${baseURL.text.trim()}/party/customers/$customerID/edit/customer/record"),
-      body: jsonEncode(customerData)
+      body: jsonEncode(customerData.toJson())
     );
 
     if(request.statusCode != 200){
@@ -74,7 +86,7 @@ abstract class App{
     }
   }
 
-  Future<void> deleteUnauthorisedCustomer(String customerID)async{
+  static Future<void> deleteUnauthorisedCustomer(String customerID)async{
     checkForBaseURL();
 
     final request = await http.delete(

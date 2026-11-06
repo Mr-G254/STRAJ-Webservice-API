@@ -74,10 +74,11 @@ class _DeleteCustomerState extends State<DeleteCustomer>{
               shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(5)),
               elevation: 0
             ),
-            onPressed: () {
+            onPressed: () async{
               App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.clear);
               if(customer.text.isNotEmpty) {
-                Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "Delete an Unauthorised customer: ${customer.text}", operation: T24Operation.deleteCustomer, data: {'customer' : customer.text},)));
+                await Navigator.push(context, DialogRoute(context: context, builder: (context) => CustomDialog(type: ResponseType.none, title: "Delete an Unauthorised customer: ${customer.text}", operation: T24Operation.deleteCustomer, data: {'customer' : customer.text},)));
+                customer.text = "";
               }else{
                 App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.fail,successOrErrorText: "Enter the Customer ID to proceed");
               }

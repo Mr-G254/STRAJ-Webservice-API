@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:straj_webservice/Backend/Account.dart';
+import 'package:straj_webservice/Backend/Customer.dart';
 import 'package:straj_webservice/Backend/SuccessOrFail.dart';
 import 'package:straj_webservice/Enums/OperationStatus.dart';
 import 'package:straj_webservice/Enums/ResponseType.dart';
@@ -229,12 +230,46 @@ class Input extends StatelessWidget{
   }
 }
 
-class CustomDialog extends StatelessWidget{
+class CustomDialog extends StatefulWidget {
   final ResponseType type;
   final String title;
   final T24Operation operation;
-  final Map<String,dynamic> data;
+  final Map<String, dynamic> data;
   const CustomDialog({super.key, required this.type, required this.title, required this.operation, required this.data});
+
+  @override
+  State<CustomDialog> createState() => _CustomDialogState();
+}
+
+class _CustomDialogState extends State<CustomDialog>{
+  bool isLoading = false;
+
+  final loadingWidget = SizedBox(
+    width: 23,
+    height: 23,
+    // margin: EdgeInsets.all(5),
+    child: Center(
+      child: CircularProgressIndicator(
+        // padding: EdgeInsets.all(5),
+        strokeWidth: 2.5,
+        strokeCap: StrokeCap.round,
+        color: Colors.white,
+      ),
+    ),
+  );
+
+  final textWidget = Container(
+    padding: EdgeInsets.only(),
+    child: Text(
+      "Delete customer",
+      style: TextStyle(
+        fontFamily: "IBM_Plex_Mono",
+        fontSize: 14,
+        color: Colors.white,
+        fontWeight: FontWeight.w400
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -246,7 +281,7 @@ class CustomDialog extends StatelessWidget{
           Container(
             padding: EdgeInsets.only(bottom: 5),
             child: Text(
-              title,
+              widget.title,
               style: TextStyle(
                 fontFamily: "IBM_Plex_Mono",
                 fontSize: 17,
@@ -272,7 +307,7 @@ class CustomDialog extends StatelessWidget{
         children: [
           Expanded(child: SizedBox()),
           Visibility(
-            visible: operation == T24Operation.editCustomerData,
+            visible: widget.operation == T24Operation.editCustomerData,
             child: Container(
               padding: EdgeInsets.only(right: 20),
               height: 35,
@@ -329,7 +364,7 @@ class CustomDialog extends StatelessWidget{
             ),
           ),
           Visibility(
-            visible: operation == T24Operation.deleteCustomer,
+            visible: widget.operation == T24Operation.deleteCustomer,
             child: Container(
               padding: EdgeInsets.only(right: 20),
               height: 35,
@@ -339,19 +374,26 @@ class CustomDialog extends StatelessWidget{
                   shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(5)),
                   elevation: 0
                 ),
-                onPressed: () => Navigator.pop(context),
-                child: Container(
-                  padding: EdgeInsets.only(),
-                  child: Text(
-                    "Delete Customer",
-                    style: TextStyle(
-                      fontFamily: "IBM_Plex_Mono",
-                      fontSize: 13,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w400
-                    ),
-                  ),
-                )
+                onPressed: ()async{
+                  setState(() {
+                    isLoading = true;
+                  });
+
+                  try{
+                     await App.deleteUnauthorisedCustomer(widget.data['customer']);
+
+                     if(context.mounted){
+                       Navigator.pop(context);
+                     }
+                     App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.success,successOrErrorText: "The account has been successfully deleted");
+                  }catch(e){
+                    App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.fail,successOrErrorText: e.toString());
+                  }
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
+                child: isLoading? loadingWidget : textWidget,
               ),
             ),
           ),
@@ -363,13 +405,13 @@ class CustomDialog extends StatelessWidget{
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(12)),
       backgroundColor: Colors.white,
       child: Container(
-        width: operation == T24Operation.searchAllCustomerAccounts? 700 : 600,
+        width: widget.operation == T24Operation.searchAllCustomerAccounts? 800 : 600,
         padding: EdgeInsets.only(),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             titleBar,
-            operation == T24Operation.searchAllCustomerAccounts? Flexible(child: AllCustomerAccDisplay(data: data)) : operation == T24Operation.createAccount? NewAccountDisplay(data: data["data"] as Account) : operation == T24Operation.editCustomerData? EditCustomerDisplay(data: data) : operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: data) : SizedBox(height: 20,),
+            widget.operation == T24Operation.searchAllCustomerAccounts? Flexible(child: AllCustomerAccDisplay(data: widget.data)) : widget.operation == T24Operation.createAccount? NewAccountDisplay(data: widget.data["data"] as Account) : widget.operation == T24Operation.editCustomerData? EditCustomerDisplay(data: widget.data) : widget.operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: widget.data) : SizedBox(height: 20,),
             bottomBar
           ],
         ),
@@ -484,17 +526,43 @@ class NewAccountLabel extends StatelessWidget{
   }
 }
 
-class EditCustomerDisplay extends StatelessWidget{
-  final Map<String,dynamic> data;
-  EditCustomerDisplay({super.key, required this.data,});
+class EditCustomerDisplay extends StatefulWidget {
+  final Map<String, dynamic> data;
+  const EditCustomerDisplay({super.key, required this.data,});
 
+  @override
+  State<EditCustomerDisplay> createState() => _EditCustomerDisplayState();
+}
+
+class _EditCustomerDisplayState extends State<EditCustomerDisplay>{
+
+  // late final data = widget.data['data'] as Ma;
   final mnemonic = TextEditingController();
   final shortName = TextEditingController();
   final name = TextEditingController();
   final sector = TextEditingController();
   final language = TextEditingController();
-  final reside = TextEditingController();
+  final residence = TextEditingController();
   final nationality = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    Customer cust = widget.data['data'] as Customer;
+    mnemonic.text = cust.mnemonic;
+    shortName.text = cust.shortName;
+    name.text = cust.name;
+    sector.text = cust.sector;
+    language.text = cust.language;
+    residence.text = cust.residence;
+    nationality.text = cust.nationality;
+  }
+
+  void updateCustomerJson(String key, TextEditingController data){
+
+  }
 
   @override
   Widget build(BuildContext context){
@@ -523,7 +591,7 @@ class EditCustomerDisplay extends StatelessWidget{
             children: [
               Input(controller: language, label: "Language"),
               SizedBox(height: 10,),
-              Input(controller: reside, label: "Reside"),
+              Input(controller: residence, label: "Residence"),
               SizedBox(height: 10,),
               Input(controller: nationality, label: "Nationality"),
               SizedBox(height: 85,),
@@ -681,15 +749,16 @@ class AllCustomerAccDisplay extends StatelessWidget{
     final accounts = data['data'] as List<Account>;
 
     final display = CustomDataTable(
-      columns: ["Account ID","Type","Currency","Working Balance"],
+      columns: ["Account ID","Account Title","Type","Currency","Working Balance"],
       tableData: List.generate(accounts.length, (index){
-        return [accounts[index].id,accounts[index].accountType ?? '',accounts[index].currency ?? '',accounts[index].workBalance.toString()];
+        return [accounts[index].id,accounts[index].accountTitle,accounts[index].accountType ?? '',accounts[index].currency ?? '',accounts[index].workBalance.toString()];
       }),
       columnRatio: <int, TableColumnWidth>{
         0 : FlexColumnWidth(2),
         1 : FlexColumnWidth(3),
-        2 : FlexColumnWidth(1.5),
-        3 : FlexColumnWidth(3),
+        2 : FlexColumnWidth(3),
+        3 : FlexColumnWidth(1.5),
+        4 : FlexColumnWidth(2),
       },
     );
 
