@@ -243,29 +243,29 @@ class CustomDialog extends StatefulWidget {
 
 class _CustomDialogState extends State<CustomDialog>{
   bool isLoading = false;
+  Map<String,dynamic> editCustomerData = {};
 
-  final loadingWidget = SizedBox(
+  late final loadingWidget = SizedBox(
     width: 23,
     height: 23,
-    // margin: EdgeInsets.all(5),
     child: Center(
       child: CircularProgressIndicator(
         // padding: EdgeInsets.all(5),
         strokeWidth: 2.5,
         strokeCap: StrokeCap.round,
-        color: Colors.white,
+        color: widget.operation == T24Operation.deleteCustomer? Colors.white : Color(0xff0B1F5E),
       ),
     ),
   );
 
-  final textWidget = Container(
+  late final textWidget = Container(
     padding: EdgeInsets.only(),
     child: Text(
-      "Delete customer",
+      widget.operation == T24Operation.deleteCustomer? "Delete customer" : widget.operation == T24Operation.editCustomerData? "Save Changes" : "",
       style: TextStyle(
         fontFamily: "IBM_Plex_Mono",
         fontSize: 14,
-        color: Colors.white,
+        color: widget.operation == T24Operation.deleteCustomer? Colors.white : Color(0xff0B1F5E),
         fontWeight: FontWeight.w400
       ),
     ),
@@ -320,19 +320,29 @@ class _CustomDialogState extends State<CustomDialog>{
                   ),
                   elevation: 0
                 ),
-                onPressed: () => Navigator.pop(context),
-                child: Container(
-                  padding: EdgeInsets.only(),
-                  child: Text(
-                    "Save Changes",
-                    style: TextStyle(
-                      fontFamily: "IBM_Plex_Mono",
-                      fontSize: 13,
-                      color: Color(0xff0B1F5E),
-                      fontWeight: FontWeight.w500
-                    ),
-                  ),
-                )
+                onPressed: (){
+                  setState(() {
+                    isLoading = true;
+                  });
+
+
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
+                child: isLoading? loadingWidget : textWidget,
+                // child: Container(
+                //   padding: EdgeInsets.only(),
+                //   child: Text(
+                //     "Save Changes",
+                //     style: TextStyle(
+                //       fontFamily: "IBM_Plex_Mono",
+                //       fontSize: 13,
+                //       color: Color(0xff0B1F5E),
+                //       fontWeight: FontWeight.w500
+                //     ),
+                //   ),
+                // )
               ),
             ),
           ),
@@ -411,7 +421,13 @@ class _CustomDialogState extends State<CustomDialog>{
           mainAxisSize: MainAxisSize.min,
           children: [
             titleBar,
-            widget.operation == T24Operation.searchAllCustomerAccounts? Flexible(child: AllCustomerAccDisplay(data: widget.data)) : widget.operation == T24Operation.createAccount? NewAccountDisplay(data: widget.data["data"] as Account) : widget.operation == T24Operation.editCustomerData? EditCustomerDisplay(data: widget.data) : widget.operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: widget.data) : SizedBox(height: 20,),
+            widget.operation == T24Operation.searchAllCustomerAccounts? Flexible(child: AllCustomerAccDisplay(data: widget.data)) :
+            widget.operation == T24Operation.createAccount? NewAccountDisplay(data: widget.data["data"] as Account) :
+            widget.operation == T24Operation.editCustomerData? EditCustomerDisplay(data: widget.data, onChanged: (Map<String, dynamic> data) {
+              setState(() {
+              editCustomerData = data;
+            }); },) :
+            widget.operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: widget.data) : SizedBox(height: 20,),
             bottomBar
           ],
         ),
@@ -528,15 +544,16 @@ class NewAccountLabel extends StatelessWidget{
 
 class EditCustomerDisplay extends StatefulWidget {
   final Map<String, dynamic> data;
-  const EditCustomerDisplay({super.key, required this.data,});
+  final Function(Map<String,dynamic> data) onChanged;
+  const EditCustomerDisplay({super.key, required this.data, required this.onChanged,});
 
   @override
   State<EditCustomerDisplay> createState() => _EditCustomerDisplayState();
 }
 
 class _EditCustomerDisplayState extends State<EditCustomerDisplay>{
+  Map<String,dynamic> editedData = {};
 
-  // late final data = widget.data['data'] as Ma;
   final mnemonic = TextEditingController();
   final shortName = TextEditingController();
   final name = TextEditingController();
@@ -544,6 +561,17 @@ class _EditCustomerDisplayState extends State<EditCustomerDisplay>{
   final language = TextEditingController();
   final residence = TextEditingController();
   final nationality = TextEditingController();
+
+  void updateCustomerJson(String key, TextEditingController data){
+    editedData[key] = data.text;
+
+    if(editedData.isNotEmpty && editedData != widget.data){
+      widget.onChanged(editedData);
+    }else{
+      widget.onChanged({});
+    }
+  }
+
 
   @override
   void initState() {
@@ -558,10 +586,29 @@ class _EditCustomerDisplayState extends State<EditCustomerDisplay>{
     language.text = cust.language;
     residence.text = cust.residence;
     nationality.text = cust.nationality;
+
+    editedData = widget.data;
+
+    mnemonic.addListener(() => updateCustomerJson('mnemonic',mnemonic));
+    shortName.addListener(() => updateCustomerJson('shortName',mnemonic));
+    name.addListener(() => updateCustomerJson('name',mnemonic));
+    sector.addListener(() => updateCustomerJson('sector',mnemonic));
+    language.addListener(() => updateCustomerJson('language',mnemonic));
+    residence.addListener(() => updateCustomerJson('residence',mnemonic));
+    nationality.addListener(() => updateCustomerJson('nationality',mnemonic));
   }
 
-  void updateCustomerJson(String key, TextEditingController data){
-
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    mnemonic.removeListener(() => updateCustomerJson('mnemonic',mnemonic));
+    shortName.removeListener(() => updateCustomerJson('shortName',mnemonic));
+    name.removeListener(() => updateCustomerJson('name',mnemonic));
+    sector.removeListener(() => updateCustomerJson('sector',mnemonic));
+    language.removeListener(() => updateCustomerJson('language',mnemonic));
+    residence.removeListener(() => updateCustomerJson('residence',mnemonic));
+    nationality.removeListener(() => updateCustomerJson('nationality',mnemonic));
+    super.dispose();
   }
 
   @override
