@@ -46,8 +46,8 @@ Note: you can't delete an authorised Customer record
 
 ## T24 Setup
 ### Customer Accounts Enquiry API
- T24 | T24 | T24 |
- :---: | :---: | :---: |
+ T24 | T24 |
+ :---: | :---: |
 | ![Customer Accounts Enquiry API](images/1.ENQA.png) | ![Customer Accounts Enquiry API](images/1.ENQB.png) |
 
 ### Creating Current Account Version API
