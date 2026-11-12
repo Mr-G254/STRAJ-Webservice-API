@@ -1,4 +1,9 @@
 # STRAJ Webservice API Assignment
+## Table of Contents
+- [Introduction](#Introduction)
+- [Overview](#Overview)
+- [T24 Enquiry and Version Setuo](#T24-Setup)
+- [Workbench API Setup](#Workbench-Setup)
 
 ## Introduction
 This project is a continuation of the T24 Webservice API assignmet which Involved:
@@ -44,7 +49,7 @@ Note: you can't delete an authorised Customer record
 ![Delete Customer UI](images/Test/delCustomerA.png)
 ![Delete Customer UI](images/Test/delCustomerB.png)
 
-## T24 Setup
+## T24-Setup
 ### Customer Accounts Enquiry API
  T24 | T24 |
  :---: | :---: |
@@ -72,7 +77,7 @@ Note: The fields in this version are not necesarry because we are only deleting 
  :---: | :---: | :---: |
 | ![Del Unauth Cust](images/4.VERSA.png) | ![Del Unauth Cust](images/4.VERSB.png) | ![Del Unauth Cust](images/4.VERSC.png) |
 
-## Workbench Overview Setup
+## Workbench-Setup
 All APIs are added to the workbench through their respective ` GB Description ` for the respective Versions and Enquiries
 
 ![API Endpoint](images/APIEND.A.png)
