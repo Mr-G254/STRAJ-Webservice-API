@@ -71,3 +71,10 @@ Note: The fields in this version are not necesarry because we are only deleting 
  T24 | T24 | T24 |
  :---: | :---: | :---: |
 | ![Del Unauth Cust](images/4.VERSA.png) | ![Del Unauth Cust](images/4.VERSB.png) | ![Del Unauth Cust](images/4.VERSC.png) |
+
+## Workbench Overview Setup
+All APIs are added to the workbench through their respective ` GB Description ` for the respective Versions and Enquiries
+
+![API Endpoint](images/APIEND.A.png)
+![API Endpoint](images/APIEND.B.png)
+![API Endpoint](images/APIEND.C.png)
