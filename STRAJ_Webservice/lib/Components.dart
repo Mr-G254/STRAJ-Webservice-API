@@ -320,15 +320,29 @@ class _CustomDialogState extends State<CustomDialog>{
                   ),
                   elevation: 0
                 ),
-                onPressed: (){
-                  setState(() {
-                    isLoading = true;
-                  });
+                onPressed: ()async{
+                  App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.clear);
+                  if(editCustomerData.isNotEmpty){
+                    setState(() {
+                      isLoading = true;
+                    });
 
+                    try{
+                      var custData = Customer.fromJson(editCustomerData);
+                      await App.editCustomerRecord(custData.id, custData);
+                      App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.success,successOrErrorText: 'Customer ${editCustomerData['id']} data has been successfully edited');
 
-                  setState(() {
-                    isLoading = false;
-                  });
+                      if(context.mounted){
+                        Navigator.of(context).pop();
+                      }
+                    }catch(e){
+                      App.showSuccessOrFail.value = SuccessOrFail(status: OperationStatus.fail,successOrErrorText: e.toString());
+                    }
+
+                    setState(() {
+                      isLoading = false;
+                    });
+                  }
                 },
                 child: isLoading? loadingWidget : textWidget,
                 // child: Container(
@@ -425,8 +439,11 @@ class _CustomDialogState extends State<CustomDialog>{
             widget.operation == T24Operation.createAccount? NewAccountDisplay(data: widget.data["data"] as Account) :
             widget.operation == T24Operation.editCustomerData? EditCustomerDisplay(data: widget.data, onChanged: (Map<String, dynamic> data) {
               setState(() {
-              editCustomerData = data;
-            }); },) :
+                editCustomerData = data;
+              });
+              print(editCustomerData);
+              print('');
+            },) :
             widget.operation ==T24Operation.deleteCustomer? DeleteCustomerDisplay(data: widget.data) : SizedBox(height: 20,),
             bottomBar
           ],
@@ -552,6 +569,7 @@ class EditCustomerDisplay extends StatefulWidget {
 }
 
 class _EditCustomerDisplayState extends State<EditCustomerDisplay>{
+  late Customer cust;
   Map<String,dynamic> editedData = {};
 
   final mnemonic = TextEditingController();
@@ -563,9 +581,12 @@ class _EditCustomerDisplayState extends State<EditCustomerDisplay>{
   final nationality = TextEditingController();
 
   void updateCustomerJson(String key, TextEditingController data){
-    editedData[key] = data.text;
 
-    if(editedData.isNotEmpty && editedData != widget.data){
+    editedData[key] = data.text;
+    print(editedData);
+    print('object');
+
+    if(editedData != cust.toJson()){
       widget.onChanged(editedData);
     }else{
       widget.onChanged({});
@@ -578,7 +599,7 @@ class _EditCustomerDisplayState extends State<EditCustomerDisplay>{
     // TODO: implement initState
     super.initState();
 
-    Customer cust = widget.data['data'] as Customer;
+    cust = widget.data['data'] as Customer;
     mnemonic.text = cust.mnemonic;
     shortName.text = cust.shortName;
     name.text = cust.name;
@@ -587,27 +608,27 @@ class _EditCustomerDisplayState extends State<EditCustomerDisplay>{
     residence.text = cust.residence;
     nationality.text = cust.nationality;
 
-    editedData = widget.data;
+    editedData = cust.toJson();
 
     mnemonic.addListener(() => updateCustomerJson('mnemonic',mnemonic));
-    shortName.addListener(() => updateCustomerJson('shortName',mnemonic));
-    name.addListener(() => updateCustomerJson('name',mnemonic));
-    sector.addListener(() => updateCustomerJson('sector',mnemonic));
-    language.addListener(() => updateCustomerJson('language',mnemonic));
-    residence.addListener(() => updateCustomerJson('residence',mnemonic));
-    nationality.addListener(() => updateCustomerJson('nationality',mnemonic));
+    shortName.addListener(() => updateCustomerJson('shortName',shortName));
+    name.addListener(() => updateCustomerJson('name',name));
+    sector.addListener(() => updateCustomerJson('sector',sector));
+    language.addListener(() => updateCustomerJson('language',language));
+    residence.addListener(() => updateCustomerJson('residence',residence));
+    nationality.addListener(() => updateCustomerJson('nationality',nationality));
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
-    mnemonic.removeListener(() => updateCustomerJson('mnemonic',mnemonic));
-    shortName.removeListener(() => updateCustomerJson('shortName',mnemonic));
-    name.removeListener(() => updateCustomerJson('name',mnemonic));
-    sector.removeListener(() => updateCustomerJson('sector',mnemonic));
-    language.removeListener(() => updateCustomerJson('language',mnemonic));
-    residence.removeListener(() => updateCustomerJson('residence',mnemonic));
-    nationality.removeListener(() => updateCustomerJson('nationality',mnemonic));
+    mnemonic.dispose();
+    shortName.dispose();
+    name.dispose();
+    sector.dispose();
+    language.dispose();
+    residence.dispose();
+    nationality.dispose();
     super.dispose();
   }
 

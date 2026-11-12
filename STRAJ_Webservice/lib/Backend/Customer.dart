@@ -1,4 +1,5 @@
 class Customer{
+  final String id;
   final String mnemonic;
   final String shortName;
   final String name;
@@ -6,9 +7,10 @@ class Customer{
   final String language;
   final String residence;
   final String nationality;
-  const Customer({required this.mnemonic, required this.shortName, required this.name, required this.sector, required this.language, required this.residence, required this.nationality,});
+  const Customer({required this.mnemonic, required this.shortName, required this.name, required this.sector, required this.language, required this.residence, required this.nationality, required this.id,});
 
   factory Customer.fromJson(Map<String, dynamic> data) => Customer(
+    id: data['id'] as String? ?? '',
     mnemonic: data['mnemonic'] as String? ?? '',
     shortName: data['shortName'] as String? ?? '',
     name: data['name'] as String? ?? '',
@@ -19,6 +21,7 @@ class Customer{
   );
 
   Map<String, dynamic> toJson() => {
+    'id':id,
     'mnemonic': mnemonic,
     'shortName': shortName,
     'name': name,

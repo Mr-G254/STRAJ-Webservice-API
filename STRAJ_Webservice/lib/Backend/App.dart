@@ -77,12 +77,13 @@ abstract class App{
     checkForBaseURL();
 
     final request = await http.put(
-      Uri.parse("${baseURL.text.trim()}/party/customers/$customerID/edit/customer/record"),
-      body: jsonEncode(customerData.toJson())
+      Uri.parse("${baseURL.text.trim()}/party/customers/$customerID/edit/customer/data"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"body" : customerData.toJson()})
     );
 
     if(request.statusCode != 200){
-      throw Exception(jsonDecode(request.body)['message']);
+      throw Exception(jsonDecode(request.body)['error']['errorDetails']);
     }
   }
 
