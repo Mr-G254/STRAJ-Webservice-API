@@ -26,7 +26,7 @@ Creates a current Account(CATEGORY : 1001)
 ![Create Account UI](images/Test/createAccount.png)
 ![Create Account UI](images/Test/createAccountOutput.png)
 
-Verifying the on T24. Note that the inputter is OFS IRIS.
+Verifying the created account on T24. Note that the inputter is OFS IRIS.
 
 <img at="Create Account T24" src="images/Test/createAccountOutputT24.png" height="500">
 
