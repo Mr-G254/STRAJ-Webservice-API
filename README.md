@@ -1,4 +1,4 @@
-# STRAJ Webservice API Assignment
+# STRAJ Webservice API Project
 ## Table of Contents
 - [Introduction](#Introduction)
 - [Overview](#Overview)
